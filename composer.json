@@ -1,0 +1,20 @@
+{
+    "name": "rooftopcms/rooftop-response-sanitiser",
+    "description": "Include related posts that the editor has defined via the posts2posts plugin",
+    "license": "GPL-3.0",
+    "authors": [
+        {
+            "name": "Rooftop CMS",
+            "email": "hello@rooftopcms.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://wpackagist.org"
+        }
+    ],
+    "type": "wordpress-muplugin",
+    "require": {
+    }
+}
