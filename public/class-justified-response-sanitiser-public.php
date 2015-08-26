@@ -100,6 +100,35 @@ class Justified_Response_Sanitiser_Public {
 
 	}
 
+    /**
+     * @param $data
+     * @return WP_REST_Response
+     *
+     * Remove the _links attribute from our response by duplicating the
+     * WP_REST_Response object by creating a new one and copying the attributes (but not links)
+     *
+     */
+    public function sanitise_response_remove_links($data) {
+        $new_response = new WP_REST_Response();
+        $new_response->set_matched_route($data->get_matched_route());
+        $new_response->set_matched_handler($data->get_matched_handler());
+        $new_response->set_headers($data->get_headers());
+        $new_response->set_status($data->get_status());
+        $new_response->set_data($data->get_data());
+
+        return $new_response;
+    }
+
+    /**
+     * @param $data
+     * @param $post
+     * @param $request
+     * @return mixed
+     *
+     * Cleanup the response object by removing some fields that we dont want, and including some new ones.
+     * ie. we remove the rendered html content and include a json_encoded version from the post->post_content
+     *
+     */
     public function sanitise_response($data, $post, $request) {
         // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
         unset($data->data['content']['rendered']);
@@ -109,7 +138,7 @@ class Justified_Response_Sanitiser_Public {
         return $data;
     }
 
-    function encode_body($data, $post) {
+    private function encode_body($data, $post) {
         $data->data['content']['json_encoded'] = json_encode($post->post_content);
 
         return $data;
