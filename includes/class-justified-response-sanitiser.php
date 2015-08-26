@@ -171,8 +171,6 @@ class Justified_Response_Sanitiser {
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
 
-        $this->loader->add_filter('plugins_loaded', $plugin_public, 'register_filters', 100);
-
         $this->loader->add_action('rest_prepare_post', $plugin_public, 'sanitise_response', 10, 3);
 	}
 
