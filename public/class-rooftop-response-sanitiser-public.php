@@ -114,6 +114,8 @@ class Rooftop_Response_Sanitiser_Public {
             return $data;
         }
 
+
+        // create a new response object without getting the links from the existing $data response
         $new_response = new WP_REST_Response();
         $new_response->set_matched_route($data->get_matched_route());
         $new_response->set_matched_handler($data->get_matched_handler());
@@ -134,18 +136,18 @@ class Rooftop_Response_Sanitiser_Public {
      * ie. we remove the rendered html content and include a json_encoded version from the post->post_content
      *
      */
-    public function sanitise_response($data, $post, $request) {
+    public function sanitise_response($response, $post, $request) {
         // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
-        unset($data->data['content']['rendered']);
+        unset($response->data['content']['rendered']);
 
-        $this->encode_body($data, $post);
+        $this->encode_body($response, $post);
 
-        return $data;
+        return $response;
     }
 
-    private function encode_body($data, $post) {
-        $data->data['content']['json_encoded'] = json_encode($post->post_content);
+    private function encode_body($response, $post) {
+        $response->data['content']['json_encoded'] = json_encode($post->post_content);
 
-        return $data;
+        return $response;
     }
 }
