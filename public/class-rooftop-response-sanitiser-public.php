@@ -137,16 +137,24 @@ class Rooftop_Response_Sanitiser_Public {
      *
      */
     public function sanitise_response($response, $post, $request) {
-        // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
-        unset($response->data['content']['rendered']);
-
         $this->encode_body($response, $post);
+        $this->encode_excerpt($response, $post);
 
         return $response;
     }
 
     private function encode_body($response, $post) {
+        // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
+        unset($response->data['content']['rendered']);
         $response->data['content']['json_encoded'] = json_encode($post->post_content);
+
+        return $response;
+    }
+
+    private function encode_excerpt($response, $post) {
+        // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
+        unset($response->data['excerpt']['rendered']);
+        $response->data['excerpt']['json_encoded'] = json_encode($post->post_excerpt);
 
         return $response;
     }
