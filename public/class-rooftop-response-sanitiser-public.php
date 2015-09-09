@@ -168,4 +168,11 @@ class Rooftop_Response_Sanitiser_Public {
 
         return $response;
     }
+
+
+    // sanitise_menu_item_response
+    public function sanitise_menu_item_response($item){
+        $item['url'] = $item['url'].="?fixme-added-in-class-rooftop-response-sanitiser-public=sanitise_menu_item_response";
+        return $item;
+    }
 }
