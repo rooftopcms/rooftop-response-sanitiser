@@ -137,8 +137,18 @@ class Rooftop_Response_Sanitiser_Public {
      *
      */
     public function sanitise_response($response, $post, $request) {
+        $response->data['title'] = $post->post_title;
+
+        $this->remove_attributes($response, $post);
+
         $this->encode_body($response, $post);
         $this->encode_excerpt($response, $post);
+
+        return $response;
+    }
+
+    private function remove_attributes($response, $post){
+        unset($response->data['guid']);
 
         return $response;
     }
