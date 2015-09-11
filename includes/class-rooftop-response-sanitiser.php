@@ -175,6 +175,8 @@ class Rooftop_Response_Sanitiser {
         $this->loader->add_action('rest_prepare_post', $plugin_public, 'sanitise_response_remove_links');
 
         $this->loader->add_filter('rest_menus_format_menu_item', $plugin_public, 'sanitise_menu_item_response');
+
+        $this->loader->add_action('rest_prepare_post', $plugin_public, 'prepare_content_urls', 10, 3);
 	}
 
 	/**

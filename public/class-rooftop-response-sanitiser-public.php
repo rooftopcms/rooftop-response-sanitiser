@@ -156,7 +156,7 @@ class Rooftop_Response_Sanitiser_Public {
     private function encode_body($response, $post) {
         // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
         unset($response->data['content']['rendered']);
-        $response->data['content']['json_encoded'] = json_encode($post->post_content);
+        $response->data['content']['json_encoded'] = $post->post_content;
 
         return $response;
     }
@@ -164,7 +164,7 @@ class Rooftop_Response_Sanitiser_Public {
     private function encode_excerpt($response, $post) {
         // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
         unset($response->data['excerpt']['rendered']);
-        $response->data['excerpt']['json_encoded'] = json_encode($post->post_excerpt);
+        $response->data['excerpt']['json_encoded'] = $post->post_excerpt;
 
         return $response;
     }
@@ -175,4 +175,58 @@ class Rooftop_Response_Sanitiser_Public {
         $item['url'] = $item['url'].="?fixme-added-in-class-rooftop-response-sanitiser-public=sanitise_menu_item_response";
         return $item;
     }
+
+    public function prepare_content_urls($response, $post, $request) {
+        $content = $response->data['content']['json_encoded'];
+        $dom = new DOMDocument();
+        @$dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $xpath = new DOMXPath($dom);
+
+        // get the links that point to this site - ignore those that point to other url's
+        $local_href = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST'];
+        $links = $xpath->query("//a[starts-with(@href, '$local_href')]");
+
+        $count = $links->length -1;
+        while($count > -1) {
+            $link = $links->item($count);
+            $url = parse_url($link->getAttribute('href'));
+
+            $content_type = "";
+            if($url['host']==$_SERVER['HTTP_HOST']) {
+                $path = array_values(array_filter(explode("/", $url['path'])));
+
+                switch(count($path)){
+                    case 0:
+                        $content_type = "page";
+                        $content_id   = null; // link to the root page
+                        break;
+                    case 1:
+                        $content_type = "page";
+                        $content_id   = $path[0];
+                        break;
+                    case 2:
+                        $content_type = "post";
+                        $content_id   = $path[1];
+                        break;
+                    case 3:
+                        $content_type = $path[1];
+                        $content_id   = $path[2];
+                        break;
+                }
+                $content_text = $link->textContent;
+
+                $placeholder_segments = array('type'=>$content_type, 'text'=>$content_text, 'id'=>$content_id);
+                $placeholder_str = "[link ".implode(':', array_map(function ($v, $k) { return $k . '=' . $v; }, $placeholder_segments, array_keys($placeholder_segments)))."]";
+                $placeholder = $dom->createTextNode($placeholder_str);
+                $link->parentNode->replaceChild($placeholder, $link);
+            }
+
+            $count--;
+        }
+
+        $response->data['content']['json_encoded'] = $dom->saveHTML();
+        return $response;
+    }
+
+    
 }
