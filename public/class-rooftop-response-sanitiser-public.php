@@ -172,7 +172,7 @@ class Rooftop_Response_Sanitiser_Public {
 
     // sanitise_menu_item_response
     public function sanitise_menu_item_response($item){
-        $item['url'] = $item['url'].="?fixme-added-in-class-rooftop-response-sanitiser-public=sanitise_menu_item_response";
+        $item['url'] = $this->parse_url($item['url']);
         return $item;
     }
 
@@ -189,37 +189,13 @@ class Rooftop_Response_Sanitiser_Public {
         $count = $links->length -1;
         while($count > -1) {
             $link = $links->item($count);
-            $url = parse_url($link->getAttribute('href'));
 
-            $content_type = "";
-            if($url['host']==$_SERVER['HTTP_HOST']) {
-                $path = array_values(array_filter(explode("/", $url['path'])));
+            $placeholder_shortcode = $this->parse_url($link->getAttribute('href'));
+            $placeholder_shortcode['text'] = $link->textContent; // also include the link text as part of the shortcode
 
-                switch(count($path)){
-                    case 0:
-                        $content_type = "page";
-                        $content_id   = null; // link to the root page
-                        break;
-                    case 1:
-                        $content_type = "page";
-                        $content_id   = $path[0];
-                        break;
-                    case 2:
-                        $content_type = "post";
-                        $content_id   = $path[1];
-                        break;
-                    case 3:
-                        $content_type = $path[1];
-                        $content_id   = $path[2];
-                        break;
-                }
-                $content_text = $link->textContent;
-
-                $placeholder_segments = array('type'=>$content_type, 'text'=>$content_text, 'id'=>$content_id);
-                $placeholder_str = "[link ".implode(':', array_map(function ($v, $k) { return $k . '=' . $v; }, $placeholder_segments, array_keys($placeholder_segments)))."]";
-                $placeholder = $dom->createTextNode($placeholder_str);
-                $link->parentNode->replaceChild($placeholder, $link);
-            }
+            $placeholder_shortcode_str = "[link ".implode(':', array_map(function ($v, $k) { return $k . '=' . $v; }, $placeholder_shortcode, array_keys($placeholder_shortcode)))."]";
+            $placeholder = $dom->createTextNode($placeholder_shortcode_str);
+            $link->parentNode->replaceChild($placeholder, $link);
 
             $count--;
         }
@@ -228,5 +204,35 @@ class Rooftop_Response_Sanitiser_Public {
         return $response;
     }
 
-    
+    private function parse_url($_url) {
+        $url = parse_url($_url);
+
+        if($url['host'] != $_SERVER['HTTP_HOST']){
+            return $_url;
+        }
+
+        $path = array_values(array_filter(explode("/", $url['path'])));
+        $content_id = $content_type = null;
+
+        switch(count($path)){
+            case 0:
+                $content_type = "page";
+                $content_id   = null; // link to the root page
+                break;
+            case 1:
+                $content_type = "page";
+                $content_id   = $path[0];
+                break;
+            case 2:
+                $content_type = "post";
+                $content_id   = $path[1];
+                break;
+            case 3:
+                $content_type = $path[1];
+                $content_id   = $path[2];
+                break;
+        }
+
+        return array('type'=>$content_type, 'id'=>$content_id);
+    }
 }
