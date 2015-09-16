@@ -148,7 +148,7 @@ class Rooftop_Response_Sanitiser_Public {
 
     // sanitise_menu_item_response
     public function sanitise_menu_item_response($item){
-        $item['url'] = $this->parse_url($item['url']);
+        $item['url'] = $this->parse_url($item['url'], $stringify_ancestors=false);
         return $item;
     }
 
@@ -190,10 +190,12 @@ class Rooftop_Response_Sanitiser_Public {
     }
 
     function return_link_object($response) {
-        return $response->data['link'] = $this->parse_url($response->data['link']);
+        $url_object = $this->parse_url($response->data['link'], $stringify_ancestors=false);
+
+        return $response->data['link'] = $url_object;
     }
 
-    private function parse_url($_url) {
+    private function parse_url($_url, $stringify_ancestors=true) {
         $post_id = url_to_postid($_url);
 
         if($post_id) {
@@ -211,7 +213,7 @@ class Rooftop_Response_Sanitiser_Public {
             $shortcode_attributes = array('type'=>$content_type, 'id'=>$content_id);
 
             if(count($ancestors)){
-                $shortcode_attributes['ancestors'] = implode(',', array_reverse($ancestors));
+                $shortcode_attributes['ancestors'] = $stringify_ancestors ? implode(',', array_reverse($ancestors)) : array_reverse($ancestors);
             }
 
             return $shortcode_attributes;
