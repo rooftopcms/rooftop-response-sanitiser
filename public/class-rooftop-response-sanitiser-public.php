@@ -178,8 +178,10 @@ class Rooftop_Response_Sanitiser_Public {
 
     public function prepare_content_urls($response, $post, $request) {
         $content = $response->data['content']['json_encoded'];
+        $content_wrapped = "<span id='rooftop-content-wrapper'>".$content."</span>";
+
         $dom = new DOMDocument();
-        @$dom->loadHTML($content, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        @$dom->loadHTML($content_wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $xpath = new DOMXPath($dom);
 
         // get the links that point to this site - ignore those that point to other url's
@@ -191,7 +193,7 @@ class Rooftop_Response_Sanitiser_Public {
             $link = $links->item($count);
 
             $placeholder_shortcode = $this->parse_url($link->getAttribute('href'));
-            $placeholder_shortcode['text'] = $link->textContent; // also include the link text as part of the shortcode
+            $placeholder_shortcode['content'] = $link->textContent; // also include the link text as part of the shortcode
 
             $placeholder_shortcode_str = "[link ".implode(':', array_map(function ($v, $k) { return $k . '=' . $v; }, $placeholder_shortcode, array_keys($placeholder_shortcode)))."]";
             $placeholder = $dom->createTextNode($placeholder_shortcode_str);
@@ -200,39 +202,42 @@ class Rooftop_Response_Sanitiser_Public {
             $count--;
         }
 
-        $response->data['content']['json_encoded'] = $dom->saveHTML();
+        // get the content wrapper and return its html content
+        $html = '';
+        $el = $dom->getElementById('rooftop-content-wrapper');
+        foreach($el->childNodes as $child) {
+            $html .= $dom->saveHTML($child);
+        }
+
+        $response->data['content']['json_encoded'] = $html;
         return $response;
     }
 
     private function parse_url($_url) {
-        $url = parse_url($_url);
+        $post_id = url_to_postid($_url);
 
-        if($url['host'] != $_SERVER['HTTP_HOST']){
+        if($post_id) {
+            $url = parse_url($_url);
+            $post = get_post($post_id);
+            $ancestors = get_ancestors($post_id, $post->post_type);
+
+            if($url['host'] != $_SERVER['HTTP_HOST']){
+                return $_url;
+            }
+
+            $content_type = $post->post_type;
+            $content_id   = $post->ID;
+
+            $shortcode_attributes = array('type'=>$content_type, 'id'=>$content_id);
+
+            if(count($ancestors)){
+                $shortcode_attributes['ancestors'] = implode(',', array_reverse($ancestors));
+            }
+
+            return $shortcode_attributes;
+        }else {
             return $_url;
         }
 
-        $path = array_values(array_filter(explode("/", $url['path'])));
-        $content_id = $content_type = null;
-
-        switch(count($path)){
-            case 0:
-                $content_type = "page";
-                $content_id   = null; // link to the root page
-                break;
-            case 1:
-                $content_type = "page";
-                $content_id   = $path[0];
-                break;
-            case 2:
-                $content_type = "post";
-                $content_id   = $path[1];
-                break;
-            case 3:
-                $content_type = $path[1];
-                $content_id   = $path[2];
-                break;
-        }
-
-        return array('type'=>$content_type, 'id'=>$content_id);
     }
 }

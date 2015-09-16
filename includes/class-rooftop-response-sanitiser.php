@@ -168,15 +168,20 @@ class Rooftop_Response_Sanitiser {
 
 		$plugin_public = new Rooftop_Response_Sanitiser_Public( $this->get_plugin_name(), $this->get_version() );
 
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
-		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
+		$this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
+
+        $this->loader->add_filter('rest_menus_format_menu_item', $plugin_public, 'sanitise_menu_item_response');
 
         $this->loader->add_action('rest_prepare_post', $plugin_public, 'sanitise_response', 10, 3);
         $this->loader->add_action('rest_prepare_post', $plugin_public, 'sanitise_response_remove_links');
 
-        $this->loader->add_filter('rest_menus_format_menu_item', $plugin_public, 'sanitise_menu_item_response');
+        $this->loader->add_action('rest_prepare_page', $plugin_public, 'sanitise_response', 10, 3);
+        $this->loader->add_action('rest_prepare_page', $plugin_public, 'sanitise_response_remove_links');
 
         $this->loader->add_action('rest_prepare_post', $plugin_public, 'prepare_content_urls', 10, 3);
+        $this->loader->add_action('rest_prepare_page', $plugin_public, 'prepare_content_urls', 10, 3);
+
 	}
 
 	/**
