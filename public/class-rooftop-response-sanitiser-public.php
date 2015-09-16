@@ -102,32 +102,6 @@ class Rooftop_Response_Sanitiser_Public {
 
     /**
      * @param $data
-     * @return WP_REST_Response
-     *
-     * Remove the _links attribute from our response by duplicating the
-     * WP_REST_Response object by creating a new one and copying the attributes (but not links)
-     *
-     */
-    public function sanitise_response_remove_links($data) {
-        // if we've got an error here, then we can just return it
-        if(is_wp_error($data)){
-            return $data;
-        }
-
-
-        // create a new response object without getting the links from the existing $data response
-        $new_response = new WP_REST_Response();
-        $new_response->set_matched_route($data->get_matched_route());
-        $new_response->set_matched_handler($data->get_matched_handler());
-        $new_response->set_headers($data->get_headers());
-        $new_response->set_status($data->get_status());
-        $new_response->set_data($data->get_data());
-
-        return $new_response;
-    }
-
-    /**
-     * @param $data
      * @param $post
      * @param $request
      * @return mixed
@@ -143,6 +117,8 @@ class Rooftop_Response_Sanitiser_Public {
 
         $this->encode_body($response, $post);
         $this->encode_excerpt($response, $post);
+
+        $this->return_link_object($response);
 
         return $response;
     }
@@ -211,6 +187,10 @@ class Rooftop_Response_Sanitiser_Public {
 
         $response->data['content']['json_encoded'] = $html;
         return $response;
+    }
+
+    function return_link_object($response) {
+        return $response->data['link'] = $this->parse_url($response->data['link']);
     }
 
     private function parse_url($_url) {
