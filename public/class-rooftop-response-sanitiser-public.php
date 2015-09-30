@@ -169,11 +169,13 @@ class Rooftop_Response_Sanitiser_Public {
             $link = $links->item($count);
 
             $placeholder_shortcode = $this->parse_url($link->getAttribute('href'));
-            $placeholder_shortcode['content'] = $link->textContent; // also include the link text as part of the shortcode
+            if(is_array($placeholder_shortcode)){
+                $placeholder_shortcode['content'] = $link->textContent; // also include the link text as part of the shortcode
+                $placeholder_shortcode_str = "[link ".implode(':', array_map(function ($v, $k) { return $k . '=' . $v; }, $placeholder_shortcode, array_keys($placeholder_shortcode)))."]";
+                $placeholder = $dom->createTextNode($placeholder_shortcode_str);
+                $link->parentNode->replaceChild($placeholder, $link);
+            }
 
-            $placeholder_shortcode_str = "[link ".implode(':', array_map(function ($v, $k) { return $k . '=' . $v; }, $placeholder_shortcode, array_keys($placeholder_shortcode)))."]";
-            $placeholder = $dom->createTextNode($placeholder_shortcode_str);
-            $link->parentNode->replaceChild($placeholder, $link);
 
             $count--;
         }
@@ -197,15 +199,12 @@ class Rooftop_Response_Sanitiser_Public {
 
     private function parse_url($_url, $stringify_ancestors=true) {
         $post_id = url_to_postid($_url);
+        $url = parse_url($_url);
+        $internal_link = $url['host'] == $_SERVER['HTTP_HOST'];
 
         if($post_id) {
-            $url = parse_url($_url);
             $post = get_post($post_id);
             $ancestors = get_ancestors($post_id, $post->post_type);
-
-            if($url['host'] != $_SERVER['HTTP_HOST']){
-                return $_url;
-            }
 
             $content_type = $post->post_type;
             $content_id   = $post->ID;
@@ -217,6 +216,10 @@ class Rooftop_Response_Sanitiser_Public {
             }
 
             return $shortcode_attributes;
+        }elseif($internal_link) {
+            $front_page = array('type' => 'relative', 'path' => $url['path']);
+
+            return $front_page;
         }else {
             return $_url;
         }
