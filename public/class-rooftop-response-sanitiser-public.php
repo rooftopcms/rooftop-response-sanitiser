@@ -100,6 +100,18 @@ class Rooftop_Response_Sanitiser_Public {
 
 	}
 
+    public function prepare_response_hooks(){
+        $types = get_post_types(array(
+            'public' => true
+        ));
+
+        foreach($types as $key => $type) {
+            add_action("rest_prepare_$type", array($this, 'sanitise_response'), 10, 3);
+            add_action("rest_prepare_$type", array($this, 'prepare_content_urls'), 10, 3);
+            add_action("rest_prepare_$type", array($this, 'sideload_taxonomies'), 10, 3);
+        }
+    }
+
     /**
      * @param $data
      * @param $post
@@ -223,6 +235,20 @@ class Rooftop_Response_Sanitiser_Public {
         }else {
             return $_url;
         }
+    }
 
+    public function sideload_taxonomies($response, $post, $request) {
+        $post_type = get_post_type_object($post->post_type);
+
+        if($post_type->include_taxonomies_in_response) {
+            $response->data['taxonomies'] = [];
+
+            $taxonomies = get_post_taxonomies($post);
+            foreach($taxonomies as $taxonomy_name){
+                $response->data['taxonomies'][] = get_the_terms($post->ID, $taxonomy_name);
+            }
+        }
+
+        return $response;
     }
 }
