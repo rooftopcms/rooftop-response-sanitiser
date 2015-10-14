@@ -240,7 +240,7 @@ class Rooftop_Response_Sanitiser_Public {
     public function sideload_taxonomies($response, $post, $request) {
         $post_type = get_post_type_object($post->post_type);
 
-        if($post_type->include_taxonomies_in_response) {
+        if(property_exists($post_type, 'include_taxonomies_in_response') && $post_type->include_taxonomies_in_response) {
             $response->data['taxonomies'] = [];
 
             $taxonomies = get_post_taxonomies($post);
