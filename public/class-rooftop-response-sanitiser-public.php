@@ -100,7 +100,11 @@ class Rooftop_Response_Sanitiser_Public {
 
 	}
 
-    public function prepare_response_hooks(){
+    /**
+     * Hook callback - called in rest_api_init()
+     */
+    public function prepare_content_response_hooks() {
+        // register hooks for specific post types
         $types = get_post_types(array(
             'public' => true
         ));
@@ -108,64 +112,112 @@ class Rooftop_Response_Sanitiser_Public {
         foreach($types as $key => $type) {
             add_action("rest_prepare_$type", array($this, 'sanitise_response'), 10, 3);
             add_action("rest_prepare_$type", array($this, 'prepare_content_urls'), 10, 3);
-            add_action("rest_prepare_$type", array($this, 'sideload_taxonomies'), 10, 3);
         }
     }
 
     /**
-     * @param $data
+     * Hook callback - called in rest_api_init()
+     */
+    public function add_content_field(){
+        // for each content type, add the plaintext content and excerpt fields
+        $types = get_post_types(array(
+            'public' => true
+        ));
+
+        foreach($types as $key => $type) {
+            register_api_field( $type,
+                'content',
+                array(
+                    'get_callback'    => array( $this, 'add_plaintext_content' ),
+                    'update_callback' => null,
+                    'schema'          => null,
+                )
+            );
+
+            register_api_field( $type,
+                'excerpt',
+                array(
+                    'get_callback'    => array( $this, 'add_plaintext_excerpt' ),
+                    'update_callback' => null,
+                    'schema'          => null,
+                )
+            );
+        }
+    }
+
+    /**
+     * @param $object
+     * @param $field
+     * @param $request
+     * @return array
+     *
+     * return an array to the caller with the plaintext post content as the value
+     */
+    function add_plaintext_content($object, $field, $request) {
+        $post = get_post($object['id']);
+        return array('json' => $post->post_content);
+    }
+
+    /**
+     * @param $object
+     * @param $field
+     * @param $request
+     * @return array
+     *
+     * return an array to the caller with the plaintext post excerpt as the value
+     */
+    function add_plaintext_excerpt($object, $field, $request) {
+        $post = get_post($object['id']);
+        return array('json' => $post->post_excerpt);
+    }
+
+    /**
+     * @param $response
      * @param $post
      * @param $request
+     * @internal param $data
      * @return mixed
      *
-     * Cleanup the response object by removing some fields that we dont want, and including some new ones.
-     * ie. we remove the rendered html content and include a json_encoded version from the post->post_content
-     *
+     * Cleanup the response object by removing some fields that we dont
+     * want, and json-encoding some others (like the link attribute)
      */
     public function sanitise_response($response, $post, $request) {
+        // plain text post title
         $response->data['title'] = $post->post_title;
 
-        $this->remove_attributes($response, $post);
-
-        $this->encode_body($response, $post);
-        $this->encode_excerpt($response, $post);
-
-        $this->return_link_object($response);
-
-        return $response;
-    }
-
-    private function remove_attributes($response, $post){
-        unset($response->data['guid']);
-
-        return $response;
-    }
-
-    private function encode_body($response, $post) {
-        // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
+        // remove the rendered html version of the content and excerpt
         unset($response->data['content']['rendered']);
-        $response->data['content']['json_encoded'] = $post->post_content;
-
-        return $response;
-    }
-
-    private function encode_excerpt($response, $post) {
-        // dont include the WP rendered content (includes all sorts of markup and scripts we dont want)
         unset($response->data['excerpt']['rendered']);
-        $response->data['excerpt']['json_encoded'] = $post->post_excerpt;
+
+        // return the link attribute as a json object of post type and id
+        $this->return_link_as_object($response);
 
         return $response;
     }
 
-
-    // sanitise_menu_item_response
+    /**
+     * @param $item
+     * @return mixed
+     *
+     * for a given menu item, parse the url and return a json object with the
+     * required attributes to build a valid link in the client
+     */
     public function sanitise_menu_item_response($item){
         $item['url'] = $this->parse_url($item['url'], $stringify_ancestors=false);
         return $item;
     }
 
+    /**
+     * @param $response
+     * @param $post
+     * @param $request
+     * @return mixed
+     *
+     * remove internal links to pages/posts/anything with a shortcode which we can parse in
+     * the client libs to render a valid link to the content on the client-side
+     */
     public function prepare_content_urls($response, $post, $request) {
-        $content = $response->data['content']['json_encoded'];
+        $content = $response->data['content']['json'];
         $content_wrapped = "<span id='rooftop-content-wrapper'>".$content."</span>";
 
         $dom = new DOMDocument();
@@ -188,7 +240,6 @@ class Rooftop_Response_Sanitiser_Public {
                 $link->parentNode->replaceChild($placeholder, $link);
             }
 
-
             $count--;
         }
 
@@ -199,16 +250,30 @@ class Rooftop_Response_Sanitiser_Public {
             $html .= $dom->saveHTML($child);
         }
 
-        $response->data['content']['json_encoded'] = $html;
+        $response->data['content']['json'] = $html;
         return $response;
     }
 
-    function return_link_object($response) {
+    /**
+     * @param $response
+     * @return array
+     *
+     * mutates $response to turn link: 'http://foo.bar.com/posts/12' into {type: 'post', id: 5} (includes an array of ancestors if necessary)
+     */
+    function return_link_as_object($response) {
         $url_object = $this->parse_url($response->data['link'], $stringify_ancestors=false);
 
         return $response->data['link'] = $url_object;
     }
 
+    /**
+     * @param $_url
+     * @param bool $stringify_ancestors
+     * @return array
+     *
+     *
+     * helper to parse a url to return its content type and ID as a json object
+     */
     private function parse_url($_url, $stringify_ancestors=true) {
         $post_id = url_to_postid($_url);
         $url = parse_url($_url);
@@ -223,7 +288,7 @@ class Rooftop_Response_Sanitiser_Public {
 
             $shortcode_attributes = array('type'=>$content_type, 'id'=>$content_id);
 
-            if(count($ancestors)){
+            if(count($ancestors)) {
                 $shortcode_attributes['ancestors'] = $stringify_ancestors ? implode(',', array_reverse($ancestors)) : array_reverse($ancestors);
             }
 
@@ -235,20 +300,5 @@ class Rooftop_Response_Sanitiser_Public {
         }else {
             return $_url;
         }
-    }
-
-    public function sideload_taxonomies($response, $post, $request) {
-        $post_type = get_post_type_object($post->post_type);
-
-        if(property_exists($post_type, 'include_taxonomies_in_response') && $post_type->include_taxonomies_in_response) {
-            $response->data['taxonomies'] = [];
-
-            $taxonomies = get_post_taxonomies($post);
-            foreach($taxonomies as $taxonomy_name){
-                $response->data['taxonomies'][] = get_the_terms($post->ID, $taxonomy_name);
-            }
-        }
-
-        return $response;
     }
 }
