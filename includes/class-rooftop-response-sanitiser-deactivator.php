@@ -6,8 +6,8 @@
  * @link       http://errorstudio.co.uk
  * @since      1.0.0
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  */
 
 /**
@@ -16,11 +16,11 @@
  * This class defines all code necessary to run during the plugin's deactivation.
  *
  * @since      1.0.0
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  * @author     Error <info@errorstudio.co.uk>
  */
-class Justified_Response_Sanitiser_Deactivator {
+class Rooftop_Response_Sanitiser_Deactivator {
 
 	/**
 	 * Short Description. (use period)

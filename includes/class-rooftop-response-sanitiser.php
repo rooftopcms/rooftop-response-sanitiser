@@ -9,8 +9,8 @@
  * @link       http://errorstudio.co.uk
  * @since      1.0.0
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  */
 
 /**
@@ -23,11 +23,11 @@
  * version of the plugin.
  *
  * @since      1.0.0
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  * @author     Error <info@errorstudio.co.uk>
  */
-class Justified_Response_Sanitiser {
+class Rooftop_Response_Sanitiser {
 
 	/**
 	 * The loader that's responsible for maintaining and registering all hooks that power
@@ -35,7 +35,7 @@ class Justified_Response_Sanitiser {
 	 *
 	 * @since    1.0.0
 	 * @access   protected
-	 * @var      Justified_Response_Sanitiser_Loader    $loader    Maintains and registers all hooks for the plugin.
+	 * @var      Rooftop_Response_Sanitiser_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
 	protected $loader;
 
@@ -68,7 +68,7 @@ class Justified_Response_Sanitiser {
 	 */
 	public function __construct() {
 
-		$this->plugin_name = 'justified-response-sanitiser';
+		$this->plugin_name = 'rooftop-response-sanitiser';
 		$this->version = '1.0.0';
 
 		$this->load_dependencies();
@@ -83,10 +83,10 @@ class Justified_Response_Sanitiser {
 	 *
 	 * Include the following files that make up the plugin:
 	 *
-	 * - Justified_Response_Sanitiser_Loader. Orchestrates the hooks of the plugin.
-	 * - Justified_Response_Sanitiser_i18n. Defines internationalization functionality.
-	 * - Justified_Response_Sanitiser_Admin. Defines all hooks for the admin area.
-	 * - Justified_Response_Sanitiser_Public. Defines all hooks for the public side of the site.
+	 * - Rooftop_Response_Sanitiser_Loader. Orchestrates the hooks of the plugin.
+	 * - Rooftop_Response_Sanitiser_i18n. Defines internationalization functionality.
+	 * - Rooftop_Response_Sanitiser_Admin. Defines all hooks for the admin area.
+	 * - Rooftop_Response_Sanitiser_Public. Defines all hooks for the public side of the site.
 	 *
 	 * Create an instance of the loader which will be used to register the hooks
 	 * with WordPress.
@@ -100,33 +100,33 @@ class Justified_Response_Sanitiser {
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-justified-response-sanitiser-loader.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rooftop-response-sanitiser-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-justified-response-sanitiser-i18n.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-rooftop-response-sanitiser-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-justified-response-sanitiser-admin.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-rooftop-response-sanitiser-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-justified-response-sanitiser-public.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-rooftop-response-sanitiser-public.php';
 
-		$this->loader = new Justified_Response_Sanitiser_Loader();
+		$this->loader = new Rooftop_Response_Sanitiser_Loader();
 
 	}
 
 	/**
 	 * Define the locale for this plugin for internationalization.
 	 *
-	 * Uses the Justified_Response_Sanitiser_i18n class in order to set the domain and to register the hook
+	 * Uses the Rooftop_Response_Sanitiser_i18n class in order to set the domain and to register the hook
 	 * with WordPress.
 	 *
 	 * @since    1.0.0
@@ -134,7 +134,7 @@ class Justified_Response_Sanitiser {
 	 */
 	private function set_locale() {
 
-		$plugin_i18n = new Justified_Response_Sanitiser_i18n();
+		$plugin_i18n = new Rooftop_Response_Sanitiser_i18n();
 		$plugin_i18n->set_domain( $this->get_plugin_name() );
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
@@ -150,7 +150,7 @@ class Justified_Response_Sanitiser {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Justified_Response_Sanitiser_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Rooftop_Response_Sanitiser_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -166,7 +166,7 @@ class Justified_Response_Sanitiser {
 	 */
 	private function define_public_hooks() {
 
-		$plugin_public = new Justified_Response_Sanitiser_Public( $this->get_plugin_name(), $this->get_version() );
+		$plugin_public = new Rooftop_Response_Sanitiser_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
@@ -199,7 +199,7 @@ class Justified_Response_Sanitiser {
 	 * The reference to the class that orchestrates the hooks with the plugin.
 	 *
 	 * @since     1.0.0
-	 * @return    Justified_Response_Sanitiser_Loader    Orchestrates the hooks of the plugin.
+	 * @return    Rooftop_Response_Sanitiser_Loader    Orchestrates the hooks of the plugin.
 	 */
 	public function get_loader() {
 		return $this->loader;

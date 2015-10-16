@@ -22,7 +22,7 @@
  * @link       http://errorstudio.co.uk
  * @since      1.0.0
  *
- * @package    Justified_Response_Sanitiser
+ * @package    Rooftop_Response_Sanitiser
  */
 
 // If uninstall not called from WordPress, then exit.

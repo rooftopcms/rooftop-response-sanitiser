@@ -8,8 +8,8 @@
  * @link       http://errorstudio.co.uk
  * @since      1.0.0
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/public/partials
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/public/partials
  */
 ?>
 

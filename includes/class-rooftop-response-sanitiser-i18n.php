@@ -9,8 +9,8 @@
  * @link       http://errorstudio.co.uk
  * @since      1.0.0
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  */
 
 /**
@@ -20,11 +20,11 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  * @author     Error <info@errorstudio.co.uk>
  */
-class Justified_Response_Sanitiser_i18n {
+class Rooftop_Response_Sanitiser_i18n {
 
 	/**
 	 * The domain specified for this plugin.

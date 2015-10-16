@@ -6,8 +6,8 @@
  * @link       http://errorstudio.co.uk
  * @since      1.0.0
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  */
 
 /**
@@ -17,11 +17,11 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/includes
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/includes
  * @author     Error <info@errorstudio.co.uk>
  */
-class Justified_Response_Sanitiser_Loader {
+class Rooftop_Response_Sanitiser_Loader {
 
 	/**
 	 * The array of actions registered with WordPress.

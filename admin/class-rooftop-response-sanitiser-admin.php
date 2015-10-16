@@ -6,8 +6,8 @@
  * @link       http://errorstudio.co.uk
  * @since      1.0.0
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/admin
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/admin
  */
 
 /**
@@ -16,11 +16,11 @@
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
  *
- * @package    Justified_Response_Sanitiser
- * @subpackage Justified_Response_Sanitiser/admin
+ * @package    Rooftop_Response_Sanitiser
+ * @subpackage Rooftop_Response_Sanitiser/admin
  * @author     Error <info@errorstudio.co.uk>
  */
-class Justified_Response_Sanitiser_Admin {
+class Rooftop_Response_Sanitiser_Admin {
 
 	/**
 	 * The ID of this plugin.
@@ -65,15 +65,15 @@ class Justified_Response_Sanitiser_Admin {
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Justified_Response_Sanitiser_Loader as all of the hooks are defined
+		 * defined in Rooftop_Response_Sanitiser_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Justified_Response_Sanitiser_Loader will then create the relationship
+		 * The Rooftop_Response_Sanitiser_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/justified-response-sanitiser-admin.css', array(), $this->version, 'all' );
+		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/rooftop-response-sanitiser-admin.css', array(), $this->version, 'all' );
 
 	}
 
@@ -88,15 +88,15 @@ class Justified_Response_Sanitiser_Admin {
 		 * This function is provided for demonstration purposes only.
 		 *
 		 * An instance of this class should be passed to the run() function
-		 * defined in Justified_Response_Sanitiser_Loader as all of the hooks are defined
+		 * defined in Rooftop_Response_Sanitiser_Loader as all of the hooks are defined
 		 * in that particular class.
 		 *
-		 * The Justified_Response_Sanitiser_Loader will then create the relationship
+		 * The Rooftop_Response_Sanitiser_Loader will then create the relationship
 		 * between the defined hooks and the functions defined in this
 		 * class.
 		 */
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/justified-response-sanitiser-admin.js', array( 'jquery' ), $this->version, false );
+		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rooftop-response-sanitiser-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
 
