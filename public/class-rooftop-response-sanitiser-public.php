@@ -109,6 +109,11 @@ class Rooftop_Response_Sanitiser_Public {
      *
      */
     public function sanitise_response_remove_links($data) {
+        // if we've got an error here, then we can just return it
+        if(is_wp_error($data)){
+            return $data;
+        }
+
         $new_response = new WP_REST_Response();
         $new_response->set_matched_route($data->get_matched_route());
         $new_response->set_matched_handler($data->get_matched_handler());
