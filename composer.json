@@ -1,6 +1,6 @@
 {
     "name": "rooftopcms/rooftop-response-sanitiser",
-    "description": "Include related posts that the editor has defined via the posts2posts plugin",
+    "description": "The awesome WP-API includes some things in its response that we would rather handle in the client.\nFor example, we remove content['rendered'] and replace with content['json'] with links replaced with shortcodes.",
     "license": "GPL-3.0",
     "authors": [
         {
