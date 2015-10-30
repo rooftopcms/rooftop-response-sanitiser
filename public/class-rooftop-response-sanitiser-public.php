@@ -105,70 +105,11 @@ class Rooftop_Response_Sanitiser_Public {
      */
     public function prepare_content_response_hooks() {
         // register hooks for specific post types
-        $types = get_post_types(array(
-            'public' => true
-        ));
+        $types = get_post_types(array('public' => true));
 
         foreach($types as $key => $type) {
-            add_action( "rest_prepare_$type", array($this, 'sanitise_response'), 10, 3 );
-            add_action( "rest_prepare_$type", array($this, 'prepare_content_urls'), 10, 3 );
+            add_action( "rest_prepare_$type", array( $this, 'sanitise_response' ), 10, 3 );
         }
-    }
-
-    /**
-     * Hook callback - called in rest_api_init()
-     */
-    public function add_content_field() {
-        // for each content type, add the plaintext content and excerpt fields
-        $types = get_post_types(array(
-            'public' => true
-        ));
-
-        foreach($types as $key => $type) {
-            register_api_field( $type,
-                'content',
-                array(
-                    'get_callback'    => array( $this, 'add_sanitised_content' ),
-                    'update_callback' => null,
-                    'schema'          => null,
-                )
-            );
-
-            register_api_field( $type,
-                'excerpt',
-                array(
-                    'get_callback'    => array( $this, 'add_sanitised_excerpt' ),
-                    'update_callback' => null,
-                    'schema'          => null,
-                )
-            );
-        }
-    }
-
-    /**
-     * @param $object
-     * @param $field
-     * @param $request
-     * @return array
-     *
-     * return an array to the caller with the plaintext post content as the value
-     */
-    function add_sanitised_content($object, $field, $request) {
-        $post = get_post($object['id']);
-        return array('html' => $post->post_content);
-    }
-
-    /**
-     * @param $object
-     * @param $field
-     * @param $request
-     * @return array
-     *
-     * return an array to the caller with the plaintext post excerpt as the value
-     */
-    function add_sanitised_excerpt($object, $field, $request) {
-        $post = get_post($object['id']);
-        return array('html' => $post->post_excerpt);
     }
 
     /**
@@ -185,14 +126,55 @@ class Rooftop_Response_Sanitiser_Public {
         // plain text post title
         $response->data['title'] = $post->post_title;
 
-        // remove the rendered html version of the content and excerpt
-        unset($response->data['content']['rendered']);
-        unset($response->data['excerpt']['rendered']);
+        // move the content attributes into a content[basic/advanced][content/fields] structure
+        apply_filters( 'rooftop_restructure_post_response', $response, $post );
 
         // return the link attribute as a json object of post type and id
-        $this->return_link_as_object($response);
+        $response->data['link'] = apply_filters( 'rooftop_return_link_as_object', $response->data['link'] );
 
         return $response;
+    }
+
+    /**
+     * @param $response
+     * @param $post
+     *
+     * remove the content and excerpt attributes from the content
+     * field and into a nested structure like this:
+     *
+     * content: {
+     *   basic: {
+     *     content: "...",
+     *     excerpt: "..."
+     *   }
+     * }
+     *
+     */
+    function restructure_post_response($response, $post) {
+        // remove the rendered html version of the content and excerpt
+        unset($response->data['content']);
+        unset($response->data['excerpt']);
+
+        $response->data['content'] = array('basic' => array());
+
+        $response->data['content']['basic']['content'] = apply_filters( 'rooftop_sanitise_html', $post->post_content );
+        $response->data['content']['basic']['excerpt'] = apply_filters( 'rooftop_sanitise_html', $post->post_excerpt );
+
+    }
+
+    /**
+     * @param $response
+     * @return array
+     *
+     * return a links href attribute and return a json object:
+     *
+     * 'http://foo.bar.com/posts/12' => {type: 'post', id: 5} (includes an array of ancestors if necessary)
+     *
+     */
+    function return_link_as_object($link) {
+        $url_object = $this->parse_url($link, $stringify_ancestors=false);
+
+        return $url_object;
     }
 
     /**
@@ -205,34 +187,6 @@ class Rooftop_Response_Sanitiser_Public {
     public function sanitise_menu_item_response($item){
         $item['url'] = $this->parse_url($item['url'], $stringify_ancestors=false);
         return $item;
-    }
-
-    /**
-     * @param $response
-     * @param $post
-     * @param $request
-     * @return mixed
-     *
-     * remove internal links to pages/posts/anything with a shortcode which we can parse in
-     * the client libs to render a valid link to the content on the client-side
-     */
-    public function prepare_content_urls($response, $post, $request) {
-        $content = $response->data['content']['html'];
-        $response->data['content']['html'] = apply_filters( 'rooftop_sanitise_html', $content );
-
-        return $response;
-    }
-
-    /**
-     * @param $response
-     * @return array
-     *
-     * mutates $response to turn link: 'http://foo.bar.com/posts/12' into {type: 'post', id: 5} (includes an array of ancestors if necessary)
-     */
-    function return_link_as_object($response) {
-        $url_object = $this->parse_url($response->data['link'], $stringify_ancestors=false);
-
-        return $response->data['link'] = $url_object;
     }
 
     /**
