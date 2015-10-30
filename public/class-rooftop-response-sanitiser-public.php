@@ -128,7 +128,7 @@ class Rooftop_Response_Sanitiser_Public {
             register_api_field( $type,
                 'content',
                 array(
-                    'get_callback'    => array( $this, 'add_plaintext_content' ),
+                    'get_callback'    => array( $this, 'add_sanitised_content' ),
                     'update_callback' => null,
                     'schema'          => null,
                 )
@@ -137,7 +137,7 @@ class Rooftop_Response_Sanitiser_Public {
             register_api_field( $type,
                 'excerpt',
                 array(
-                    'get_callback'    => array( $this, 'add_plaintext_excerpt' ),
+                    'get_callback'    => array( $this, 'add_sanitised_excerpt' ),
                     'update_callback' => null,
                     'schema'          => null,
                 )
@@ -153,9 +153,9 @@ class Rooftop_Response_Sanitiser_Public {
      *
      * return an array to the caller with the plaintext post content as the value
      */
-    function add_plaintext_content($object, $field, $request) {
+    function add_sanitised_content($object, $field, $request) {
         $post = get_post($object['id']);
-        return array('json' => $post->post_content);
+        return array('html' => $post->post_content);
     }
 
     /**
@@ -166,9 +166,9 @@ class Rooftop_Response_Sanitiser_Public {
      *
      * return an array to the caller with the plaintext post excerpt as the value
      */
-    function add_plaintext_excerpt($object, $field, $request) {
+    function add_sanitised_excerpt($object, $field, $request) {
         $post = get_post($object['id']);
-        return array('json' => $post->post_excerpt);
+        return array('html' => $post->post_excerpt);
     }
 
     /**
@@ -217,8 +217,8 @@ class Rooftop_Response_Sanitiser_Public {
      * the client libs to render a valid link to the content on the client-side
      */
     public function prepare_content_urls($response, $post, $request) {
-        $content = $response->data['content']['json'];
-        $response->data['content']['json'] = apply_filters( 'rooftop_sanitise_html', $content );
+        $content = $response->data['content']['html'];
+        $response->data['content']['html'] = apply_filters( 'rooftop_sanitise_html', $content );
 
         return $response;
     }
