@@ -110,15 +110,15 @@ class Rooftop_Response_Sanitiser_Public {
         ));
 
         foreach($types as $key => $type) {
-            add_action("rest_prepare_$type", array($this, 'sanitise_response'), 10, 3);
-            add_action("rest_prepare_$type", array($this, 'prepare_content_urls'), 10, 3);
+            add_action( "rest_prepare_$type", array($this, 'sanitise_response'), 10, 3 );
+            add_action( "rest_prepare_$type", array($this, 'prepare_content_urls'), 10, 3 );
         }
     }
 
     /**
      * Hook callback - called in rest_api_init()
      */
-    public function add_content_field(){
+    public function add_content_field() {
         // for each content type, add the plaintext content and excerpt fields
         $types = get_post_types(array(
             'public' => true
@@ -218,7 +218,35 @@ class Rooftop_Response_Sanitiser_Public {
      */
     public function prepare_content_urls($response, $post, $request) {
         $content = $response->data['content']['json'];
-        $content_wrapped = "<span id='rooftop-content-wrapper'>".$content."</span>";
+        $response->data['content']['json'] = apply_filters( 'rooftop_sanitise_html', $content );
+
+        return $response;
+    }
+
+    /**
+     * @param $response
+     * @return array
+     *
+     * mutates $response to turn link: 'http://foo.bar.com/posts/12' into {type: 'post', id: 5} (includes an array of ancestors if necessary)
+     */
+    function return_link_as_object($response) {
+        $url_object = $this->parse_url($response->data['link'], $stringify_ancestors=false);
+
+        return $response->data['link'] = $url_object;
+    }
+
+    /**
+     * @param $html
+     * @return string
+     *
+     * parse the html snippet for internal links and replace them with
+     * shortcodes that we can render in a url-agnostic way in the client
+     *
+     * apply_filters ( 'rooftop_sanitise_html', "some html" );
+     *
+     */
+    public function sanitise_html($html) {
+        $content_wrapped = "<span id='rooftop-content-wrapper'>".$html."</span>";
 
         $dom = new DOMDocument();
         @$dom->loadHTML($content_wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
@@ -250,20 +278,7 @@ class Rooftop_Response_Sanitiser_Public {
             $html .= $dom->saveHTML($child);
         }
 
-        $response->data['content']['json'] = $html;
-        return $response;
-    }
-
-    /**
-     * @param $response
-     * @return array
-     *
-     * mutates $response to turn link: 'http://foo.bar.com/posts/12' into {type: 'post', id: 5} (includes an array of ancestors if necessary)
-     */
-    function return_link_as_object($response) {
-        $url_object = $this->parse_url($response->data['link'], $stringify_ancestors=false);
-
-        return $response->data['link'] = $url_object;
+        return $html;
     }
 
     /**
