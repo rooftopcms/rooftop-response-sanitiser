@@ -163,13 +163,13 @@ class Rooftop_Response_Sanitiser_Public {
     }
 
     /**
-     * @param $response
+     * @param $link
+     * @internal param $response
      * @return array
      *
      * return a links href attribute and return a json object:
      *
      * 'http://foo.bar.com/posts/12' => {type: 'post', id: 5} (includes an array of ancestors if necessary)
-     *
      */
     function return_link_as_object($link) {
         $url_object = $this->parse_url($link, $stringify_ancestors=false);
