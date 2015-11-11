@@ -213,13 +213,17 @@ class Rooftop_Response_Sanitiser_Public {
         $count = $links->length -1;
         while($count > -1) {
             $link = $links->item($count);
-
-            $placeholder_shortcode = $this->parse_url($link->getAttribute('href'));
-            if(is_array($placeholder_shortcode)){
-                $placeholder_shortcode['content'] = $link->textContent; // also include the link text as part of the shortcode
-                $placeholder_shortcode_str = "[link ".implode(':', array_map(function ($v, $k) { return $k . '=' . $v; }, $placeholder_shortcode, array_keys($placeholder_shortcode)))."]";
-                $placeholder = $dom->createTextNode($placeholder_shortcode_str);
-                $link->parentNode->replaceChild($placeholder, $link);
+            // parse the link and generate an array of keys and values
+            $link_data = $this->parse_url($link->getAttribute('href'));
+            if(is_array($link_data)){
+               // create a new <a> and add data attributes to it.
+               $linkNode = $dom->createElement('a',$link->textContent);
+                foreach($link_data as $k => $v) {
+                    $attr = $dom->createAttribute("data-rooftop-".$k);
+                    $attr->value = $v;
+                    $linkNode->appendChild($attr);
+                }
+                $link->parentNode->replaceChild($linkNode, $link);
             }
 
             $count--;
