@@ -219,7 +219,7 @@ class Rooftop_Response_Sanitiser_Public {
                // create a new <a> and add data attributes to it.
                $linkNode = $dom->createElement('a',$link->textContent);
                 foreach($link_data as $k => $v) {
-                    $attr = $dom->createAttribute("data-rooftop-".$k);
+                    $attr = $dom->createAttribute("data-rooftop-link-".$k);
                     $attr->value = $v;
                     $linkNode->appendChild($attr);
                 }
@@ -258,8 +258,9 @@ class Rooftop_Response_Sanitiser_Public {
 
             $content_type = $post->post_type;
             $content_id   = $post->ID;
+            $slug         = $post->post_name;
 
-            $shortcode_attributes = array('type'=>$content_type, 'id'=>$content_id);
+            $shortcode_attributes = array('type'=>$content_type, 'id'=>$content_id, 'slug'=>$slug);
 
             if(count($ancestors)) {
                 $shortcode_attributes['ancestors'] = $stringify_ancestors ? implode(',', array_reverse($ancestors)) : array_reverse($ancestors);
