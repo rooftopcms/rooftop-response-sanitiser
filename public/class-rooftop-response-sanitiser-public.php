@@ -214,11 +214,21 @@ class Rooftop_Response_Sanitiser_Public {
         while($count > -1) {
             $link = $links->item($count);
             // parse the link and generate an array of keys and values
-            $link_data = $this->parse_url($link->getAttribute('href'));
-            if(is_array($link_data)){
+            $linkData = $this->parse_url($link->getAttribute('href'));
+            if(is_array($linkData)){
                // create a new <a> and add data attributes to it.
                $linkNode = $dom->createElement('a',$link->textContent);
-                foreach($link_data as $k => $v) {
+                    // if this is a link to a custom post type, WP will return a path
+                    // to an archive page which isn't much use. We standardise that into type / slug
+                if($linkData['type'] == "relative") {
+                    // /archives/foo/bar where foo is post type and bar is slug
+                    $postTypeInfo = explode("/",$linkData['path']);
+                    $linkData['type'] = $postTypeInfo[2];
+                    $linkData['slug'] = $postTypeInfo[3];
+                    unset($linkData['path']);
+                }
+                foreach($linkData as $k => $v) {
+
                     $attr = $dom->createAttribute("data-rooftop-link-".$k);
                     $attr->value = $v;
                     $linkNode->appendChild($attr);
