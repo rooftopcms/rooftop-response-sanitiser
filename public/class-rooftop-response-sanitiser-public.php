@@ -47,6 +47,18 @@ class Rooftop_Response_Sanitiser_Public {
 	 * @param      string    $plugin_name       The name of the plugin.
 	 * @param      string    $version    The version of this plugin.
 	 */
+
+
+    /**
+     *
+     * Temporarily store the link of the requested resource in this variable so that we're not re-writing
+     * the link attribute more than once and causing issues later in the WP response (ie re-writing)...
+     *
+     * @var
+     */
+    private $tmp_link;
+
+
 	public function __construct( $plugin_name, $version ) {
 
 		$this->plugin_name = $plugin_name;
@@ -112,6 +124,18 @@ class Rooftop_Response_Sanitiser_Public {
         }
     }
 
+    public function prepare_content_response_hooks_foo() {
+        $types = get_post_types(array('public' => true));
+
+        foreach($types as $key => $type) {
+            add_action( "rest_prepare_$type", array( $this, 'sanitise_response_foo' ), 10, 3 );
+        }
+    }
+
+    function sanitise_response_foo($response, $post, $request) {
+        return $response;
+    }
+
     /**
      * @param $response
      * @param $post
@@ -123,14 +147,15 @@ class Rooftop_Response_Sanitiser_Public {
      * want, and json-encoding some others (like the link attribute)
      */
     public function sanitise_response($response, $post, $request) {
-        // plain text post title
-        $response->data['title'] = $post->post_title;
-
         // move the content attributes into a content[basic/advanced][content/fields] structure
         apply_filters( 'rooftop_restructure_post_response', $response, $post );
 
         // return the link attribute as a json object of post type and id
-        $response->data['link'] = apply_filters( 'rooftop_return_link_as_object', $response->data['link'] );
+        if(! $this->tmp_link ) {
+            $this->tmp_link = $response->data['link'];
+        }
+
+        $response->data['link'] = apply_filters( 'rooftop_return_link_as_object', $this->tmp_link );
 
         return $response;
     }
@@ -156,7 +181,6 @@ class Rooftop_Response_Sanitiser_Public {
         unset($response->data['excerpt']);
 
         $response->data['content'] = array('basic' => array());
-
         $response->data['content']['basic']['content'] = apply_filters( 'rooftop_sanitise_html', $post->post_content );
         $response->data['content']['basic']['excerpt'] = apply_filters( 'rooftop_sanitise_html', $post->post_excerpt );
 
