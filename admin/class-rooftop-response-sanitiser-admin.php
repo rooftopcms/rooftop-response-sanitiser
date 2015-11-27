@@ -100,4 +100,12 @@ class Rooftop_Response_Sanitiser_Admin {
 
 	}
 
+    /**
+     * We dont do any rendering of gravityforms in WP so we remove the shortcode tags to maintain
+     * the [gravityform] shortcode in the json responses
+     */
+    public function remove_gravityforms_shortcodes() {
+        remove_shortcode('gravityform');
+        remove_shortcode('gravityforms');
+    }
 }
