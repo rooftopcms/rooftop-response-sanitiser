@@ -124,18 +124,6 @@ class Rooftop_Response_Sanitiser_Public {
         }
     }
 
-    public function prepare_content_response_hooks_foo() {
-        $types = get_post_types(array('public' => true));
-
-        foreach($types as $key => $type) {
-            add_action( "rest_prepare_$type", array( $this, 'sanitise_response_foo' ), 10, 3 );
-        }
-    }
-
-    function sanitise_response_foo($response, $post, $request) {
-        return $response;
-    }
-
     /**
      * @param $response
      * @param $post
@@ -147,11 +135,15 @@ class Rooftop_Response_Sanitiser_Public {
      * want, and json-encoding some others (like the link attribute)
      */
     public function sanitise_response($response, $post, $request) {
+        if( is_wp_error($response) ) {
+            return $response;
+        }
+
         // move the content attributes into a content[basic/advanced][content/fields] structure
         apply_filters( 'rooftop_restructure_post_response', $response, $post );
 
         // return the link attribute as a json object of post type and id
-        if(! $this->tmp_link ) {
+        if( ! $this->tmp_link ) {
             $this->tmp_link = $response->data['link'];
         }
 
