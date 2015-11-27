@@ -262,7 +262,9 @@ class Rooftop_Response_Sanitiser_Public {
             $html .= $dom->saveHTML($child);
         }
 
-        return $html;
+        $parsed_html = do_shortcode($html);
+        
+        return $parsed_html;
     }
 
     /**

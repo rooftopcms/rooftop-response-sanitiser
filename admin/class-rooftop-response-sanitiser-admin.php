@@ -99,13 +99,4 @@ class Rooftop_Response_Sanitiser_Admin {
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/rooftop-response-sanitiser-admin.js', array( 'jquery' ), $this->version, false );
 
 	}
-
-    /**
-     * We dont do any rendering of gravityforms in WP so we remove the shortcode tags to maintain
-     * the [gravityform] shortcode in the json responses
-     */
-    public function remove_gravityforms_shortcodes() {
-        remove_shortcode('gravityform');
-        remove_shortcode('gravityforms');
-    }
 }
