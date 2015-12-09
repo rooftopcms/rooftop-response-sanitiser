@@ -230,21 +230,36 @@ class Rooftop_Response_Sanitiser_Public {
         while($count > -1) {
             $link = $links->item($count);
             // parse the link and generate an array of keys and values
-            $linkData = $this->parse_url($link->getAttribute('href'));
+            $linkData = $this->parse_url($link->getAttribute('href'),false);
             if(is_array($linkData)){
                // create a new <a> and add data attributes to it.
                $linkNode = $dom->createElement('a',$link->textContent);
-                    // if this is a link to a custom post type, WP will return a path
-                    // to an archive page which isn't much use. We standardise that into type / slug
+
+                //split the path up. In the case of an archive link we need to point to the correct post type;
+                //in the case of something with ancestors, we need to derive the ancestor slugs
+                $pathData = explode("/",$linkData['path']);
+                // if this is a link to a custom post type, WP will return a path
+                // to an archive page which isn't much use. We standardise that into type / slug
                 if($linkData['type'] == "relative") {
                     // /archives/foo/bar where foo is post type and bar is slug
-                    $postTypeInfo = explode("/",$linkData['path']);
-                    $linkData['type'] = $postTypeInfo[2];
-                    $linkData['slug'] = $postTypeInfo[3];
-                    unset($linkData['path']);
+                    $linkData['type'] = $pathData[2];
+                    $linkData['slug'] = $pathData[3];
+                } elseif(array_key_exists('ancestors',$linkData)) {
+                    // this has ancestors, and we need to grab the slugs
+                    $ancestorCount = count($linkData['ancestors']);
+                    $ancestorSlugs = array_slice($pathData, -$ancestorCount-1,-1);
+                    $linkData['ancestor-slugs'] = implode(",",$ancestorSlugs);
+                    $linkData['ancestor-ids'] = implode(",", $linkData['ancestors']);
                 }
-                foreach($linkData as $k => $v) {
 
+                // We don't need the raw path, which makes no sense for consumers
+                unset($linkData['path']);
+                // We don't need the array of ancestors
+                unset($linkData['ancestors']);
+
+                $d = $linkData;
+
+                foreach($linkData as $k => $v) {
                     $attr = $dom->createAttribute("data-rooftop-link-".$k);
                     $attr->value = $v;
                     $linkNode->appendChild($attr);
@@ -288,10 +303,11 @@ class Rooftop_Response_Sanitiser_Public {
             $content_id   = $post->ID;
             $slug         = $post->post_name;
 
-            $shortcode_attributes = array('type'=>$content_type, 'id'=>$content_id, 'slug'=>$slug);
+            $shortcode_attributes = array('type'=>$content_type, 'id'=>$content_id, 'slug'=>$slug,'path' => $url['path']);
 
             if(count($ancestors)) {
-                $shortcode_attributes['ancestors'] = $stringify_ancestors ? implode(',', array_reverse($ancestors)) : array_reverse($ancestors);
+                $shortcode_attributes['ancestors'] = $stringify_ancestors ? implode(',',
+                    array_reverse($ancestors)) : array_reverse($ancestors);
             }
 
             return $shortcode_attributes;
