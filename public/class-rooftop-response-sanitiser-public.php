@@ -282,6 +282,19 @@ class Rooftop_Response_Sanitiser_Public {
         return $parsed_html;
     }
 
+    public function prepare_rest_menu_item($menu_item) {
+        $menu_item['type'] = 'menu';
+        return $menu_item;
+    }
+    public function prepare_rest_menu_items($menu_items) {
+        $menu_items = array_map(function($mi) {
+            $mi['type'] = 'menu';
+
+            return $mi;
+        }, $menu_items);
+        return $menu_items;
+    }
+
     /**
      * @param $_url
      * @param bool $stringify_ancestors

@@ -177,6 +177,9 @@ class Rooftop_Response_Sanitiser {
 
         $this->loader->add_filter( 'rooftop_restructure_post_response', $plugin_public, 'restructure_post_response', 10, 2 );
         $this->loader->add_filter( 'rooftop_return_link_as_object', $plugin_public, 'return_link_as_object' );
+
+        $this->loader->add_filter( 'rest_menus_format_menu', $plugin_public, 'prepare_rest_menu_item', 10, 1 );
+        $this->loader->add_filter( 'rest_menus_format_menus', $plugin_public, 'prepare_rest_menu_items', 10, 1 );
 	}
 
 	/**
