@@ -284,11 +284,17 @@ class Rooftop_Response_Sanitiser_Public {
 
     public function prepare_rest_menu_item($menu_item) {
         $menu_item['type'] = 'menu';
+        $menu_item['id'] = $menu_item['ID'];
+        unset($menu_item['ID']);
         return $menu_item;
     }
     public function prepare_rest_menu_items($menu_items) {
         $menu_items = array_map(function($mi) {
             $mi['type'] = 'menu';
+            $mi['id'] = $mi['ID'];
+            unset($mi['ID']);
+
+
 
             return $mi;
         }, $menu_items);
