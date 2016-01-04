@@ -175,7 +175,10 @@ class Rooftop_Response_Sanitiser_Public {
         $response->data['content'] = array('basic' => array());
         $response->data['content']['basic']['content'] = apply_filters( 'rooftop_sanitise_html', $post->post_content );
         $response->data['content']['basic']['excerpt'] = apply_filters( 'rooftop_sanitise_html', $post->post_excerpt );
-        $response->data['title'] = $response->data['title']['rendered'];
+
+        if( array_key_exists( 'title', $response->data ) && array_key_exists( 'rendered', $response->data['title'] ) ) {
+            $response->data['title'] = $response->data['title']['rendered'];
+        }
     }
 
     /**
