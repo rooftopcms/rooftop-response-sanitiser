@@ -226,7 +226,7 @@ class Rooftop_Response_Sanitiser_Public {
         $xpath = new DOMXPath($dom);
 
         // get the links that point to this site - ignore those that point to other url's
-        $local_href = $_SERVER['REQUEST_SCHEME']."://".$_SERVER['HTTP_HOST'];
+        $local_href = "http://".$_SERVER['HTTP_HOST'];
         $links = $xpath->query("//a[starts-with(@href, '$local_href')]");
 
         $count = $links->length -1;
