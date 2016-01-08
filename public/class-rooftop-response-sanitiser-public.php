@@ -148,6 +148,7 @@ class Rooftop_Response_Sanitiser_Public {
         }
 
         $response->data['link'] = apply_filters( 'rooftop_return_link_as_object', $this->tmp_link );
+        $response->data['template'] = apply_filters('rooftop_slugify', $response->data['template']);
 
         return $response;
     }
@@ -194,6 +195,18 @@ class Rooftop_Response_Sanitiser_Public {
         $url_object = $this->parse_url($link, $stringify_ancestors=false);
 
         return $url_object;
+    }
+
+    /**
+     * @param $string
+     * @internal param $response
+     * @return string
+     *
+     * return a slugified version of the provided string
+     *
+     */
+    function slugify($string) {
+        return sanitize_title_with_dashes($string);
     }
 
     /**
