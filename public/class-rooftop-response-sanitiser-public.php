@@ -148,7 +148,10 @@ class Rooftop_Response_Sanitiser_Public {
         }
 
         $response->data['link'] = apply_filters( 'rooftop_return_link_as_object', $this->tmp_link );
-        $response->data['template'] = apply_filters('rooftop_slugify', $response->data['template']);
+
+        if( array_key_exists( 'template', $response->data ) ) {
+            $response->data['template'] = apply_filters('rooftop_slugify', @$response->data['template']);
+        }
 
         return $response;
     }
