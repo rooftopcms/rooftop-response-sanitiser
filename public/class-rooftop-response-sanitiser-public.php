@@ -153,6 +153,13 @@ class Rooftop_Response_Sanitiser_Public {
             $response->data['template'] = apply_filters('rooftop_slugify', @$response->data['template']);
         }
 
+        /**
+         * if we're in preview mode and this post doesn't have a slug, generate a temporary one
+         */
+        if( ROOFTOP_PREVIEW_MODE && empty( @$response->data['slug'] ) ) {
+            $response->data['slug'] = apply_filters( 'rooftop_slugify', "draft $post->ID" );
+        }
+
         return $response;
     }
 
@@ -210,6 +217,15 @@ class Rooftop_Response_Sanitiser_Public {
      */
     function slugify($string) {
         return sanitize_title_with_dashes($string);
+    }
+
+    /**
+     * @param $string
+     *
+     * return
+     */
+    function prepare_title_for_slug( $string ) {
+
     }
 
     /**
