@@ -254,7 +254,8 @@ class Rooftop_Response_Sanitiser_Public {
         $content_wrapped = "<span id='rooftop-content-wrapper'>".$html."</span>";
 
         $dom = new DOMDocument();
-        @$dom->loadHTML($content_wrapped, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+        $dom->encoding = 'UTF-8';
+        @$dom->loadHTML(mb_convert_encoding($content_wrapped, 'HTML-ENTITIES', 'UTF-8'), LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
         $xpath = new DOMXPath($dom);
 
         // get the links that point to this site - ignore those that point to other url's
