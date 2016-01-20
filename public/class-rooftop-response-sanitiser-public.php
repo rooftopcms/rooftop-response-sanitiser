@@ -309,8 +309,8 @@ class Rooftop_Response_Sanitiser_Public {
             $html .= $dom->saveHTML($child);
         }
 
-        $parsed_html = do_shortcode($html);
-        
+        $parsed_html = do_shortcode(wpautop($html));
+
         return $parsed_html;
     }
 
