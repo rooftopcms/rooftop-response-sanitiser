@@ -264,8 +264,9 @@ class Rooftop_Response_Sanitiser_Public {
             // parse the link and generate an array of keys and values
             $linkData = $this->parse_url($link->getAttribute('href'),false);
             if(is_array($linkData)){
-               // create a new <a> and add data attributes to it.
-               $linkNode = $dom->createElement('a',$link->textContent);
+                // create a new <a> and add data attributes to it.
+                $text = htmlspecialchars($link->textContent);
+                $linkNode = $dom->createElement('a', $text);
 
                 //split the path up. In the case of an archive link we need to point to the correct post type;
                 //in the case of something with ancestors, we need to derive the ancestor slugs
@@ -288,8 +289,6 @@ class Rooftop_Response_Sanitiser_Public {
                 unset($linkData['path']);
                 // We don't need the array of ancestors
                 unset($linkData['ancestors']);
-
-                $d = $linkData;
 
                 foreach($linkData as $k => $v) {
                     $attr = $dom->createAttribute("data-rooftop-link-".$k);
