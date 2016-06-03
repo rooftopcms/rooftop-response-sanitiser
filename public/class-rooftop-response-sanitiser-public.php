@@ -269,7 +269,7 @@ class Rooftop_Response_Sanitiser_Public {
 
                 //split the path up. In the case of an archive link we need to point to the correct post type;
                 //in the case of something with ancestors, we need to derive the ancestor slugs
-                $pathData = explode("/",$linkData['path']);
+                $pathData = array_filter(explode("/",$linkData['path'])); // split the link path and remove empty components (array_filter will drop "" 's)
                 // if this is a link to a custom post type, WP will return a path
                 // to an archive page which isn't much use. We standardise that into type / slug
                 if($linkData['type'] == "relative") {
