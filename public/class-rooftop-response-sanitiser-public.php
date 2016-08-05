@@ -156,7 +156,7 @@ class Rooftop_Response_Sanitiser_Public {
         /**
          * if we're in preview mode and this post doesn't have a slug, generate a temporary one
          */
-        if( ROOFTOP_INCLUDE_DRAFTS && empty( @$response->data['slug'] ) ) {
+        if( apply_filters( 'rooftop_include_drafts', false ) && empty( @$response->data['slug'] ) ) {
             $response->data['slug'] = apply_filters( 'rooftop_slugify', "draft $post->ID" );
         }
 
