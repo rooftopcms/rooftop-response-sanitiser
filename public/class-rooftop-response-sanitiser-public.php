@@ -124,6 +124,20 @@ class Rooftop_Response_Sanitiser_Public {
         }
     }
 
+    public function register_status_field( $server ) {
+        $types = get_post_types( array( 'public' => true, 'show_in_rest' => true ) );
+
+        foreach( $types as $type ) {
+            register_rest_field( $type, 'status', array(
+                'get_callback' => function( $object, $field, $request ) {
+                        return get_post_status( $object['id'] );
+                },
+                'update_callback' => null,
+                'schema' => array( 'type' => 'string', 'context' => ['view', 'edit', 'embed'] )
+            ) );
+        }
+    }
+
     /**
      * @param $response
      * @param $post
