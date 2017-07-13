@@ -289,8 +289,8 @@ class Rooftop_Response_Sanitiser_Public {
                 // to an archive page which isn't much use. We standardise that into type / slug
                 if($linkData['type'] == "relative") {
                     // /archives/foo/bar where foo is post type and bar is slug
-                    $linkData['type'] = $pathData[2];
-                    $linkData['slug'] = $pathData[3];
+                    $linkData['type'] = @$pathData[2];
+                    $linkData['slug'] = @$pathData[3];
                 } elseif(array_key_exists('ancestors',$linkData)) {
                     // this has ancestors, and we need to grab the slugs
                     $ancestorCount = count($linkData['ancestors']);
