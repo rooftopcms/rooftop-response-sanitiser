@@ -14,13 +14,13 @@
  *
  * @wordpress-plugin
  * Plugin Name:       Rooftop Response Sanitiser
- * Plugin URI:        http://errorstudio.co.uk
- * Description:       This is a short description of what the plugin does. It's displayed in the WordPress admin area.
- * Version:           1.0.0
- * Author:            Error
- * Author URI:        http://errorstudio.co.uk
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Plugin URI:        https://github.com/rooftopcms/rooftop-response-sanitiser
+ * Description:       Alter the standard WP-API response with custom fields
+ * Version:           1.2.1
+ * Author:            RooftopCMS
+ * Author URI:        https://rooftopcms.com
+ * License:           GPL-3.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-3.0.txt
  * Text Domain:       rooftop-response-sanitiser
  * Domain Path:       /languages
  */
