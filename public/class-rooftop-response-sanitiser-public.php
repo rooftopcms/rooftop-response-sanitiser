@@ -322,7 +322,7 @@ class Rooftop_Response_Sanitiser_Public {
             $html .= $dom->saveHTML($child);
         }
 
-        $parsed_html = do_shortcode(wpautop($html));
+        $parsed_html = wpautop(do_shortcode($html));
 
         return $parsed_html;
     }
@@ -333,6 +333,7 @@ class Rooftop_Response_Sanitiser_Public {
         unset($menu_item['ID']);
         return $menu_item;
     }
+
     public function prepare_rest_menu_items($menu_items) {
         $menu_items = array_map(function($mi) {
             $mi['type'] = 'menu';
