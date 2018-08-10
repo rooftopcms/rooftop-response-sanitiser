@@ -16,7 +16,7 @@
  * Plugin Name:       Rooftop Response Sanitiser
  * Plugin URI:        https://github.com/rooftopcms/rooftop-response-sanitiser
  * Description:       Alter the standard WP-API response with custom fields
- * Version:           1.2.1
+ * Version:           1.2.1.1
  * Author:            RooftopCMS
  * Author URI:        https://rooftopcms.com
  * License:           GPL-3.0+
