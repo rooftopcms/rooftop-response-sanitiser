@@ -35,6 +35,9 @@ Yes, it's a Wordpress plugin you're welcome to use outside the context of Roofto
 
 == Changelog ==
 
+= 1.2.1.2 =
+* Remove link attribute parser as it was causing a performance hit 
+
 = 1.2.1.1 =
 * Run shortcodes before converting line breaks to paragraphs with wpautop
 
